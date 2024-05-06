@@ -25,20 +25,25 @@ namespace fs = std::filesystem;
 
 TResourceManager::TResourceManager() {
     Application::SetSubsystemStatus("ResourceManager", Application::Status::Starting);
-    std::string Path = Application::Settings.Resource + "/Client";
-    if (!fs::exists(Path))
-        fs::create_directories(Path);
-    for (const auto& entry : fs::directory_iterator(Path)) {
-        std::string File(entry.path().string());
-        if (auto pos = File.find(".zip"); pos != std::string::npos) {
-            if (File.length() - pos == 4) {
-                std::replace(File.begin(), File.end(), '\\', '/');
-                mFileList += File + ';';
-                if (auto i = File.find_last_of('/'); i != std::string::npos) {
-                    ++i;
-                    File = File.substr(i, pos - i);
+    std::string path = Application::Settings.Resource + "/Client";
+    if (!fs::exists(path))
+        fs::create_directories(path);
+
+    for (const auto& entry : fs::recursive_directory_iterator(path)) {
+        if (entry.is_regular_file()) {
+            std::string file = entry.path().string();
+            if (auto pos = file.find(".zip"); pos != std::string::npos && file.length() - pos == 4) {
+                std::replace(file.begin(), file.end(), '\\', '/');
+                mFileList += file + ';';
+
+                std::string filename = entry.path().filename().string();
+                std::string parent_directory = entry.path().parent_path().filename().string();
+                if (parent_directory != "Client") {
+                    mTrimmedList += "/" + parent_directory;
                 }
-                mTrimmedList += "/" + fs::path(File).filename().string() + ';';
+
+                mTrimmedList += "/" + filename + ';';
+
                 mFileSizes += std::to_string(size_t(fs::file_size(entry.path()))) + ';';
                 mMaxModSize += size_t(fs::file_size(entry.path()));
                 mModsLoaded++;
