@@ -45,7 +45,7 @@ void THeartbeatThread::operator()() {
         auto Now = std::chrono::high_resolution_clock::now();
         bool Unchanged = Last == Body;
         auto TimePassed = (Now - LastNormalUpdateTime);
-        auto Threshold = Unchanged ? 30 : 5;
+        auto Threshold = Unchanged ? 90 : 5;
         if (TimePassed < std::chrono::seconds(Threshold)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
@@ -108,7 +108,8 @@ void THeartbeatThread::operator()() {
             }
         } else {
             if (!Application::Settings.Private) {
-                beammp_warn("Backend failed to respond to a heartbeat. Your server may temporarily disappear from the server list. This is not an error, and will likely resolve itself soon. Direct connect will still work.");
+                beammp_info("Couldn't send info to server list, you likely didn't provide an Auth Key")
+                beammp_debug("Backend failed to respond to a heartbeat. Your server may temporarily disappear from the server list. This is not an error, and will likely resolve itself soon. Direct connect will still work.");
             }
         }
 
