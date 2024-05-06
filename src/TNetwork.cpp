@@ -32,6 +32,7 @@
 #include <cstdio>
 #include <fcntl.h> // For open, O_RDONLY, O_DIRECT
 #include <unistd.h> // For read, close
+#include <cstdlib>
 
 typedef boost::asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO> rcv_timeout_option;
 
@@ -828,7 +829,17 @@ void TNetwork::SplitLoad(TClient& c, size_t Sent, size_t Size, bool D, const std
         return;
     }
 
-    constexpr size_t BufferSize = 16384; // Adjust buffer size as needed
+    size_t BufferSize = 16384;
+
+    const char* envVarValue = std::getenv("SPLITBUFFERSIZE");
+    if (envVarValue != nullptr) {
+    try {
+        BufferSize = std::stoi(envVarValue);
+        beammp_debug("Set Buffer Size successfully to " + std::to_string(BufferSize));
+    } catch (const std::exception& e) {
+        beammp_debug("Buffer Size is not valid, using default of 16384");
+    }}
+    
     std::vector<uint8_t> Data(BufferSize);
     ip::tcp::socket* TCPSock { nullptr };
     if (D)
