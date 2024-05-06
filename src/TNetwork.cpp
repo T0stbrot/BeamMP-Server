@@ -709,7 +709,7 @@ void TNetwork::Parse(TClient& c, const std::vector<uint8_t>& Packet) {
 }
 
 void TNetwork::SendFile(TClient& c, const std::string& UnsafeName) {
-    beammp_info(c.GetName() + " requesting : " + UnsafeName.substr(UnsafeName.find_last_of('/')));
+    beammp_info(c.GetName() + " requesting : " + UnsafeName;
 
     if (!fs::path(UnsafeName).has_filename()) {
         if (!TCPSend(c, StringToVector("CO"))) {
@@ -721,7 +721,9 @@ void TNetwork::SendFile(TClient& c, const std::string& UnsafeName) {
     auto FileName = fs::path(UnsafeName).filename().string();
     FileName = Application::Settings.Resource + "/Client/" + FileName;
 
-    if (!std::filesystem::exists(FileName)) {
+    auto FileName = UnsafeName;
+    
+    if (!std::filesystem::exists(UnsafeName)) {
         if (!TCPSend(c, StringToVector("CO"))) {
             // TODO: handle
         }
