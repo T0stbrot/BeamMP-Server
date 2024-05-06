@@ -29,6 +29,10 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <cstring>
 
+#include <cstdio>
+#include <fcntl.h> // For open, O_RDONLY, O_DIRECT
+#include <unistd.h> // For read, close
+
 typedef boost::asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO> rcv_timeout_option;
 
 std::vector<uint8_t> StringToVector(const std::string& Str) {
