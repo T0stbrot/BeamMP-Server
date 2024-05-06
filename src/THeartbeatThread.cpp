@@ -108,7 +108,7 @@ void THeartbeatThread::operator()() {
             }
         } else {
             if (!Application::Settings.Private) {
-                beammp_info("Couldn't send info to server list, you likely didn't provide an Auth Key")
+                beammp_info("Couldn't send info to server list, you likely didn't provide an Auth Key");
                 beammp_debug("Backend failed to respond to a heartbeat. Your server may temporarily disappear from the server list. This is not an error, and will likely resolve itself soon. Direct connect will still work.");
             }
         }
