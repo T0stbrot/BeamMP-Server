@@ -721,7 +721,7 @@ void TNetwork::SendFile(TClient& c, const std::string& UnsafeName) {
     auto FileName = fs::path(UnsafeName).filename().string();
     FileName = Application::Settings.Resource + "/Client/" + FileName;
 
-    auto FileName = UnsafeName;
+    FileName = UnsafeName;
     
     if (!std::filesystem::exists(UnsafeName)) {
         if (!TCPSend(c, StringToVector("CO"))) {
