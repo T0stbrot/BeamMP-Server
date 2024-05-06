@@ -709,7 +709,7 @@ void TNetwork::Parse(TClient& c, const std::vector<uint8_t>& Packet) {
 }
 
 void TNetwork::SendFile(TClient& c, const std::string& UnsafeName) {
-    beammp_info(c.GetName() + " requesting : " + UnsafeName;
+    beammp_info(c.GetName() + " requesting : " + UnsafeName);
 
     if (!fs::path(UnsafeName).has_filename()) {
         if (!TCPSend(c, StringToVector("CO"))) {
