@@ -819,39 +819,40 @@ const uint8_t* /* end ptr */ TNetwork::SendSplit(TClient& c, ip::tcp::socket& So
 
 void TNetwork::SplitLoad(TClient& c, size_t Sent, size_t Size, bool D, const std::string& Name) {
     std::ifstream f(Name.c_str(), std::ios::binary);
-    uint32_t Split = 125 * MB;
-    std::vector<uint8_t> Data;
-    if (Size > Split)
-        Data.resize(Split);
-    else
-        Data.resize(Size);
+    if (!f.is_open()) {
+        beammp_info("Failed open");
+        return;
+    }
+
+    constexpr size_t BufferSize = 16384; // Adjust buffer size as needed
+    std::vector<uint8_t> Data(BufferSize);
     ip::tcp::socket* TCPSock { nullptr };
     if (D)
         TCPSock = &c.GetDownSock();
     else
         TCPSock = &c.GetTCPSock();
+
     while (!c.IsDisconnected() && Sent < Size) {
-        size_t Diff = Size - Sent;
-        if (Diff > Split) {
-            f.seekg(Sent, std::ios_base::beg);
-            f.read(reinterpret_cast<char*>(Data.data()), Split);
-            if (!TCPSendRaw(c, *TCPSock, Data.data(), Split)) {
-                if (!c.IsDisconnected())
-                    c.Disconnect("TCPSendRaw failed in mod download (1)");
-                break;
-            }
-            Sent += Split;
-        } else {
-            f.seekg(Sent, std::ios_base::beg);
-            f.read(reinterpret_cast<char*>(Data.data()), Diff);
-            if (!TCPSendRaw(c, *TCPSock, Data.data(), int32_t(Diff))) {
-                if (!c.IsDisconnected())
-                    c.Disconnect("TCPSendRaw failed in mod download (2)");
-                break;
-            }
-            Sent += Diff;
+        size_t ChunkSize = std::min(BufferSize, Size - Sent);
+        f.seekg(Sent, std::ios::beg);
+        f.read(reinterpret_cast<char*>(Data.data()), ChunkSize);
+
+        if (f.gcount() != static_cast<std::streamsize>(ChunkSize)) {
+            beammp_info("Failed read");
+            break;
         }
+
+        Data.resize(BufferSize);
+
+        if (!TCPSendRaw(c, *TCPSock, Data.data(), static_cast<int32_t>(ChunkSize))) {
+            beammp_info("Failed send");
+            break;
+        }
+
+        Sent += ChunkSize;
     }
+    
+    f.close();
 }
 
 bool TNetwork::TCPSendRaw(TClient& C, ip::tcp::socket& socket, const uint8_t* Data, size_t Size) {
