@@ -45,7 +45,7 @@ void THeartbeatThread::operator()() {
         auto Now = std::chrono::high_resolution_clock::now();
         bool Unchanged = Last == Body;
         auto TimePassed = (Now - LastNormalUpdateTime);
-        auto Threshold = Unchanged ? 90 : 5;
+        auto Threshold = Unchanged ? 30 : 5;
         if (TimePassed < std::chrono::seconds(Threshold)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
