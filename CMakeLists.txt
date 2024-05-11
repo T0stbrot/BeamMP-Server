@@ -100,7 +100,7 @@ set(PRJ_LIBRARIES
     httplib::httplib
     libzip::zip
     OpenSSL::SSL OpenSSL::Crypto
-    ${LUA_LIBRARIES}
+    #${LUA_LIBRARIES}
 )
 
 # add dependency find_package calls and similar here
