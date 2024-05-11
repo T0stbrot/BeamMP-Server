@@ -189,6 +189,19 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+#static libc
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${PRJ_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${PRJ_LIBRARIES})
+#static liblua, requires lua 5.3 dev package
+target_link_libraries(BeamMP-Server
+    /usr/lib/x86_64-linux-gnu/liblua5.3.a
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${PRJ_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${PRJ_LIBRARIES})
 target_compile_features(${PROJECT_NAME} PRIVATE ${PRJ_COMPILE_FEATURES})
